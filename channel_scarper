@@ -1,0 +1,21 @@
+import airsim
+import numpy as np
+import cv2
+
+client = airsim.MultirotorClient()
+
+# Force the drone to look at the gate manually first!
+print("Capturing diagnostic frame...")
+
+response = client.simGetImages([
+    airsim.ImageRequest("0", airsim.ImageType.Segmentation, False, False)
+])[0]
+
+img_seg = np.frombuffer(response.image_data_uint8, dtype=np.uint8).reshape(response.height, response.width, 3)
+
+# Print the unique values found in each channel
+print(f"Blue Channel IDs:  {np.unique(img_seg[:,:,0])}")
+print(f"Green Channel IDs: {np.unique(img_seg[:,:,1])}")
+print(f"Red Channel IDs:   {np.unique(img_seg[:,:,2])}")
+
+# If you see 54 in ANY of those lists, the script is working!
